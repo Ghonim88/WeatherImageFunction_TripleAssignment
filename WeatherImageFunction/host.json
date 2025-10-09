@@ -1,0 +1,41 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 20,
+        "excludedTypes": "Request"
+      },
+      "enableLiveMetricsFilters": true
+    },
+    "logLevel": {
+      "default": "Information",
+      "Function": "Information",
+      "Host.Results": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "extensions": {
+    "queues": {
+      "maxPollingInterval": "00:00:01",
+      "visibilityTimeout": "00:05:00",
+      "batchSize": 1,
+      "maxDequeueCount": 5,
+      "newBatchThreshold": 1,
+      "messageEncoding": "none"
+    },
+    "http": {
+      "routePrefix": "api",
+      "maxOutstandingRequests": 200,
+      "maxConcurrentRequests": 100,
+      "dynamicThrottlesEnabled": true
+    }
+  },
+  "concurrency": {
+    "dynamicConcurrencyEnabled": true,
+    "snapshotPersistenceEnabled": true
+  },
+  "functionTimeout": "00:10:00"
+}
