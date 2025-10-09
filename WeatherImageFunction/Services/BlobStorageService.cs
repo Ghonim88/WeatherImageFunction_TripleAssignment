@@ -27,13 +27,27 @@ public class BlobStorageService : IBlobStorageService
         try
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
+            
+            // Use public access for local development, private for production
+            var publicAccessType = _blobServiceClient.Uri.Host.Contains("127.0.0.1") || _blobServiceClient.Uri.Host.Contains("localhost")
+                ? PublicAccessType.Blob
+                : PublicAccessType.None;
+            
+            // Create container if it doesn't exist
+            await containerClient.CreateIfNotExistsAsync(publicAccessType);
+
+            // IMPORTANT: Also update access policy if container already exists
+            // This ensures the permissions are correct even if the container was created earlier
+            if (publicAccessType == PublicAccessType.Blob)
+            {
+                await containerClient.SetAccessPolicyAsync(publicAccessType);
+                _logger.LogInformation("Set container {ContainerName} to public blob access", _containerName);
+            }
 
             var blobClient = containerClient.GetBlobClient(blobName);
 
             using var stream = new MemoryStream(imageBytes);
             
-            // FIXED: Removed named parameter conflict
             var uploadOptions = new BlobUploadOptions
             {
                 HttpHeaders = new BlobHttpHeaders
@@ -44,10 +58,10 @@ public class BlobStorageService : IBlobStorageService
             
             await blobClient.UploadAsync(stream, uploadOptions, cancellationToken: default);
 
-            _logger.LogInformation("Uploaded blob: {BlobName}", blobName);
+            _logger.LogInformation("Uploaded blob: {BlobName} to container with public access: {PublicAccess}", blobName, publicAccessType);
 
-            // Return SAS URL
-            return await GetBlobSasUrlAsync(blobName);
+            // Return the blob URL
+            return blobClient.Uri.ToString();
         }
         catch (Exception ex)
         {
