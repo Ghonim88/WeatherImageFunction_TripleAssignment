@@ -34,6 +34,7 @@ public class FetchWeatherStationsFunction
 
     [Function("FetchWeatherStations")]
     public async Task Run(
+        // define the queue trigger
         [QueueTrigger("weather-stations-queue", Connection = "StorageConnectionString")] string queueMessage)
     {
         string? jobId = null;
@@ -64,7 +65,7 @@ public class FetchWeatherStationsFunction
                 return;
             }
 
-            jobStatus.Status = "Processing";
+            jobStatus.Status = JobState.Processing;
             await _tableStorageService.UpdateJobStatusAsync(jobStatus);
 
             _logger.LogInformation("Fetching weather stations for job {JobId}", jobId);
@@ -75,7 +76,7 @@ public class FetchWeatherStationsFunction
             if (stations.Count == 0)
             {
                 _logger.LogWarning("No weather stations found for job {JobId}", jobId);
-                jobStatus.Status = "Failed";
+                jobStatus.Status = JobState.Failed;
                 jobStatus.ErrorMessage = "No weather stations found";
                 jobStatus.CompletedAt = DateTime.UtcNow;
                 await _tableStorageService.UpdateJobStatusAsync(jobStatus);
@@ -134,7 +135,7 @@ public class FetchWeatherStationsFunction
                     var jobStatus = await _tableStorageService.GetJobStatusAsync(jobId);
                     if (jobStatus != null)
                     {
-                        jobStatus.Status = "Failed";
+                        jobStatus.Status = JobState.Failed;
                         jobStatus.ErrorMessage = $"Error fetching weather stations: {ex.Message}";
                         jobStatus.CompletedAt = DateTime.UtcNow;
                         await _tableStorageService.UpdateJobStatusAsync(jobStatus);

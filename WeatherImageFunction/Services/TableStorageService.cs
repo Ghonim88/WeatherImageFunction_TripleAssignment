@@ -1,10 +1,10 @@
 ﻿namespace WeatherImageFunction.Services;
 
+using System.Text.Json;
 using Azure;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using WeatherImageFunction.Models;
 
 public class TableStorageService : ITableStorageService
@@ -12,40 +12,29 @@ public class TableStorageService : ITableStorageService
     private readonly TableClient _tableClient;
     private readonly ILogger<TableStorageService> _logger;
 
-    public TableStorageService(
-        TableServiceClient tableServiceClient,
-        ILogger<TableStorageService> logger,
-        IConfiguration configuration)
+    public TableStorageService(TableServiceClient tableServiceClient, IConfiguration configuration, ILogger<TableStorageService> logger)
     {
+        _logger = logger;
         var tableName = configuration["TableName"] ?? "JobStatus";
         _tableClient = tableServiceClient.GetTableClient(tableName);
         _tableClient.CreateIfNotExists();
-        _logger = logger;
     }
 
     public async Task CreateJobStatusAsync(JobStatus jobStatus)
     {
-        try
+        var entity = new TableEntity("JobStatus", jobStatus.JobId)
         {
-            var entity = new TableEntity("JobStatus", jobStatus.JobId)
-            {
-                { nameof(JobStatus.Status), jobStatus.Status },
-                { nameof(JobStatus.TotalStations), jobStatus.TotalStations },
-                { nameof(JobStatus.ProcessedStations), jobStatus.ProcessedStations },
-                { nameof(JobStatus.ImageUrls), JsonSerializer.Serialize(jobStatus.ImageUrls) },
-                { nameof(JobStatus.CreatedAt), jobStatus.CreatedAt },
-                { nameof(JobStatus.CompletedAt), jobStatus.CompletedAt },
-                { nameof(JobStatus.ErrorMessage), jobStatus.ErrorMessage }
-            };
+            { nameof(JobStatus.Status), jobStatus.Status.ToString() },
+            { nameof(JobStatus.TotalStations), jobStatus.TotalStations },
+            { nameof(JobStatus.ProcessedStations), jobStatus.ProcessedStations },
+            { nameof(JobStatus.ImageUrls), JsonSerializer.Serialize(jobStatus.ImageUrls) },
+            { nameof(JobStatus.CreatedAt), jobStatus.CreatedAt },
+            { nameof(JobStatus.CompletedAt), jobStatus.CompletedAt },
+            { nameof(JobStatus.ErrorMessage), jobStatus.ErrorMessage }
+        };
 
-            await _tableClient.AddEntityAsync(entity);
-            _logger.LogInformation("Created job status for JobId: {JobId}", jobStatus.JobId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating job status for JobId: {JobId}", jobStatus.JobId);
-            throw;
-        }
+        await _tableClient.AddEntityAsync(entity);
+        _logger.LogInformation("Created job status for JobId: {JobId}", jobStatus.JobId);
     }
 
     public async Task<JobStatus?> GetJobStatusAsync(string jobId)
@@ -55,10 +44,13 @@ public class TableStorageService : ITableStorageService
             var response = await _tableClient.GetEntityAsync<TableEntity>("JobStatus", jobId);
             var entity = response.Value;
 
+            var statusString = entity.GetString(nameof(JobStatus.Status)) ?? nameof(JobState.Pending);
+            var parsed = Enum.TryParse<JobState>(statusString, ignoreCase: true, out var status);
+
             return new JobStatus
             {
                 JobId = jobId,
-                Status = entity.GetString(nameof(JobStatus.Status)) ?? "Unknown",
+                Status = parsed ? status : JobState.Pending,
                 TotalStations = entity.GetInt32(nameof(JobStatus.TotalStations)) ?? 0,
                 ProcessedStations = entity.GetInt32(nameof(JobStatus.ProcessedStations)) ?? 0,
                 ImageUrls = JsonSerializer.Deserialize<List<string>>(
@@ -86,7 +78,7 @@ public class TableStorageService : ITableStorageService
         {
             var entity = new TableEntity("JobStatus", jobStatus.JobId)
             {
-                { nameof(JobStatus.Status), jobStatus.Status },
+                { nameof(JobStatus.Status), jobStatus.Status.ToString() },
                 { nameof(JobStatus.TotalStations), jobStatus.TotalStations },
                 { nameof(JobStatus.ProcessedStations), jobStatus.ProcessedStations },
                 { nameof(JobStatus.ImageUrls), JsonSerializer.Serialize(jobStatus.ImageUrls) },
@@ -120,6 +112,24 @@ public class TableStorageService : ITableStorageService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error adding image URL to job {JobId}", jobId);
+            throw;
+        }
+    }
+
+    public async Task IncrementProcessedStationsAsync(string jobId)
+    {
+        try
+        {
+            var jobStatus = await GetJobStatusAsync(jobId);
+            if (jobStatus == null) return;
+
+            jobStatus.ProcessedStations++;
+            await UpdateJobStatusAsync(jobStatus);
+            _logger.LogInformation("Incremented processed stations for JobId: {JobId} to {Count}", jobId, jobStatus.ProcessedStations);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error incrementing processed stations for job {JobId}", jobId);
             throw;
         }
     }

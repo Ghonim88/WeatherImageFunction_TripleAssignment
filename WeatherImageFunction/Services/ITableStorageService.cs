@@ -8,4 +8,5 @@ public interface ITableStorageService
     Task<JobStatus?> GetJobStatusAsync(string jobId);
     Task UpdateJobStatusAsync(JobStatus jobStatus);
     Task AddImageUrlToJobAsync(string jobId, string imageUrl);
+    Task IncrementProcessedStationsAsync(string jobId);
 }

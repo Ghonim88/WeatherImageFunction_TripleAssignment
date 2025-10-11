@@ -90,7 +90,7 @@ public class StartJobFunction
             var jobStatus = new JobStatus
             {
                 JobId = jobId,
-                Status = "Pending",
+                Status = JobState.Pending,
                 TotalStations = jobRequest.MaxStations,
                 ProcessedStations = 0,
                 CreatedAt = DateTime.UtcNow
@@ -114,11 +114,11 @@ public class StartJobFunction
 
             _logger.LogInformation("Queued weather stations fetch for JobId: {JobId}", jobId);
 
-            // Return response
+            // Return response (keep Status as string for client readability)
             var response = new JobResponse
             {
                 JobId = jobId,
-                Status = "Pending",
+                Status = JobState.Pending.ToString(),
                 Message = "Job created successfully. Processing has started.",
                 CreatedAt = DateTime.UtcNow
             };

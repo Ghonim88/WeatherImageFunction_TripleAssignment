@@ -28,36 +28,20 @@ public class GetResultsFunction
         {
             _logger.LogInformation("Fetching results for JobId: {JobId}", jobId);
 
-            // Validate jobId
-            if (string.IsNullOrWhiteSpace(jobId))
-            {
-                return new BadRequestObjectResult(new { error = "JobId is required" });
-            }
-
-            if (!Guid.TryParse(jobId, out _))
-            {
-                return new BadRequestObjectResult(new { error = "Invalid JobId format" });
-            }
-
-            // Fetch job status
             var jobStatus = await _tableStorageService.GetJobStatusAsync(jobId);
-
             if (jobStatus == null)
             {
-                _logger.LogWarning("Job not found: {JobId}", jobId);
-                return new NotFoundObjectResult(new { error = $"Job with ID '{jobId}' not found" });
+                return new NotFoundObjectResult(new { error = "Job not found" });
             }
 
-            // Calculate progress percentage
             var progressPercentage = jobStatus.TotalStations > 0
-                ? (int)((double)jobStatus.ProcessedStations / jobStatus.TotalStations * 100)
+                ? (int)Math.Round((double)jobStatus.ProcessedStations / jobStatus.TotalStations * 100.0)
                 : 0;
 
-            // Build response
             var response = new
             {
                 jobStatus.JobId,
-                jobStatus.Status,
+                Status = jobStatus.Status.ToString(), // ensure readable enum in API
                 jobStatus.TotalStations,
                 jobStatus.ProcessedStations,
                 ProgressPercentage = progressPercentage,

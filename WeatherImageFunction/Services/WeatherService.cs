@@ -2,6 +2,7 @@
 
 using System.Net.Http;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WeatherImageFunction.Models;
 
@@ -9,21 +10,23 @@ public class WeatherService : IWeatherService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<WeatherService> _logger;
-    private const string BuienradarApiUrl = "https://data.buienradar.nl/2.0/feed/json";
+    private readonly string _buienradarApiUrl;
 
-    public WeatherService(HttpClient httpClient, ILogger<WeatherService> logger)
+    public WeatherService(HttpClient httpClient, ILogger<WeatherService> logger, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _logger = logger;
+        _buienradarApiUrl = configuration["BuienradarApiUrl"]
+            ?? "https://data.buienradar.nl/2.0/feed/json"; // fallback default
     }
 
     public async Task<List<WeatherStation>> GetWeatherStationsAsync(int maxStations = 50)
     {
         try
         {
-            _logger.LogInformation("Fetching weather stations from Buienradar API");
+            _logger.LogInformation("Fetching weather stations from Buienradar API: {Url}", _buienradarApiUrl);
 
-            var response = await _httpClient.GetAsync(BuienradarApiUrl);
+            var response = await _httpClient.GetAsync(_buienradarApiUrl);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

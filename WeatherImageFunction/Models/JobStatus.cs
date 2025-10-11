@@ -3,7 +3,7 @@
 public class JobStatus
 {
     public required string JobId { get; set; }
-    public required string Status { get; set; } // Pending, Processing, Completed, Failed
+    public required JobState Status { get; set; } // Pending, Processing, Completed, Failed
     public int TotalStations { get; set; }
     public int ProcessedStations { get; set; }
     public List<string> ImageUrls { get; set; } = new();
