@@ -17,7 +17,7 @@ An Azure Functions application that fetches weather station data from the Buienr
 
 ## 🏗️ Architecture
 
-## 📁 Project Structure
+### 📁 Project Structure
 
 ```
 ImageGenFunctions/
@@ -62,7 +62,7 @@ ImageGenFunctions/
 ├── Program.cs                                                  
 └── README.md                         
 ```
-sequenceDiagram
+### sequenceDiagram
     sequenceDiagram
     participant Client
     participant StartJob as StartJobFunction
@@ -378,6 +378,7 @@ Once the job is complete, you can also **click on the image URLs directly in you
 
 **Solution:**
 Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the latest secure version.
+
 
 
 
