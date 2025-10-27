@@ -1,0 +1,265 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\weatherstationsqueuemessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\weatherstationsqueuemessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\buienradarresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\buienradarresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\jobrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\jobrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\jobresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\jobresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\jobstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\jobstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\models\\jobstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\models\\jobstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\deploymenttemplate\\azuriteconfig||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\deploymenttemplate\\azuriteconfig||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\local.settings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\local.settings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\properties\\servicedependencies.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\properties\\servicedependencies.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\host.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\host.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\http\\api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\http\\api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|c:\\users\\aghon\\documents\\cloud_minor\\tripleassignment\\weatherimagefunction\\weatherimagefunction\\weatherimagefunction.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{0ACBC36E-9B6B-428F-A497-5A58DB586D2B}|WeatherImageFunction\\WeatherImageFunction.csproj|solutionrelative:weatherimagefunction\\weatherimagefunction.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 178,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Program.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Program.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Program.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Program.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAwCwAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:52:42.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WeatherStationsQueueMessage.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\WeatherStationsQueueMessage.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\WeatherStationsQueueMessage.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\WeatherStationsQueueMessage.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\WeatherStationsQueueMessage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:43.982Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BuienradarResponse.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\BuienradarResponse.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\BuienradarResponse.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\BuienradarResponse.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\BuienradarResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:39.053Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "JobRequest.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobRequest.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\JobRequest.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobRequest.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\JobRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:38.184Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "JobResponse.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobResponse.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\JobResponse.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobResponse.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\JobResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:37.629Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "JobState.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobState.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\JobState.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobState.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\JobState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:35.776Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "JobStatus.cs",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobStatus.cs",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Models\\JobStatus.cs",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Models\\JobStatus.cs",
+              "RelativeToolTip": "WeatherImageFunction\\Models\\JobStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T09:49:30.343Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AzuriteConfig",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\DeploymentTemplate\\AzuriteConfig",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\DeploymentTemplate\\AzuriteConfig",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\DeploymentTemplate\\AzuriteConfig",
+              "RelativeToolTip": "WeatherImageFunction\\DeploymentTemplate\\AzuriteConfig",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-10-27T09:47:11.722Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "serviceDependencies.json",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Properties\\serviceDependencies.json",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Properties\\serviceDependencies.json",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Properties\\serviceDependencies.json",
+              "RelativeToolTip": "WeatherImageFunction\\Properties\\serviceDependencies.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-27T09:45:54.272Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Properties\\launchSettings.json",
+              "RelativeToolTip": "WeatherImageFunction\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-27T09:45:45.468Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "host.json",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\host.json",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\host.json",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\host.json",
+              "RelativeToolTip": "WeatherImageFunction\\host.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-27T09:38:07.631Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "local.settings.json",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\local.settings.json",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\local.settings.json",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\local.settings.json",
+              "RelativeToolTip": "WeatherImageFunction\\local.settings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-27T09:36:40.239Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Api.http",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Http\\Api.http",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\Http\\Api.http",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\Http\\Api.http",
+              "RelativeToolTip": "WeatherImageFunction\\Http\\Api.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2025-10-27T09:24:31.781Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "WeatherImageFunction.csproj",
+              "DocumentMoniker": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\WeatherImageFunction.csproj",
+              "RelativeDocumentMoniker": "WeatherImageFunction\\WeatherImageFunction.csproj",
+              "ToolTip": "C:\\Users\\aghon\\Documents\\Cloud_Minor\\TripleAssignment\\WeatherImageFunction\\WeatherImageFunction\\WeatherImageFunction.csproj",
+              "RelativeToolTip": "WeatherImageFunction\\WeatherImageFunction.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-27T09:24:28.118Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:7:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
