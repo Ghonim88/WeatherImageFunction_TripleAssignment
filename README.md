@@ -337,8 +337,49 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 ## 📁 Project Structure
 
 ```
-
+ImageGenFunctions/
+│
+├── Bicep/
+│   ├── main.bicep
+|       
+├── DeplopymentTemplate/
+│   ├── deploy.ps1       
+│   ├── AzuriteConfig
+|    
+├── Functions/
+│   ├── FetchWeatherStationsFunction.cs       
+│   ├── GetResultsFunction.cs
+|   ├── ProcessImageFunction.cs
+|   ├── StartJobFunction.cs         
+│
+├── Http/
+│   ├── Api.http
+|
+├── Models/
+│   ├── BuienradarResponse.cs              
+│   ├── JobRequest.cs         
+│   ├── JobResponse.cs
+│   ├── JobState.cs         
+│   ├── JobStatus.cs         
+│   ├── ProcessImageQueueMessage.cs         
+│   ├── WeatherStation.cs         
+│   ├── WeatherStationsQueueMessage.cs                  
+│
+├── Services/
+│   ├── BlobStorageService.cs              
+│   ├── IBlobStorageService.cs         
+│   ├── IImageService.cs
+│   ├── ImageService.cs         
+│   ├── ITableStorageSerive.cs         
+│   ├── IWeatherService.cs         
+│   ├── TableSotrageService.cs         
+│   ├── WeatherService.cs
+├── local.settings.json               
+├── host.json
+├── Program.cs                                                  
+└── README.md                         
 ```
+
 
 
 
