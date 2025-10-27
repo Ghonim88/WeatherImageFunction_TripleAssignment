@@ -111,23 +111,39 @@ Create or update `local.settings.json`:
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "BUIENRADAR_API_KEY": "<your_buienradar_api_key>",
-    "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=<account_name>;AccountKey=<account_key>;EndpointSuffix=core.windows.net",
-    "TABLE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=<account_name>;AccountKey=<account_key>;TableEndpoint=https://<account_name>.table.core.windows.net/",
-    "CONTAINER_NAME": "weatherimages",
-    "QUEUE_NAME": "weather-stations-queue",
-    "PROCESS_IMAGE_QUEUE": "process-image-queue",
-    "AZURE_FUNCTIONS_JOB_HOST__LOGGING__LOG_LEVEL": "Debug",
-    "WEATHER_API_URL": "https://api.buienradar.nl/data/public/2.0/json-feed-static",
-    "WEATHER_IMAGE_SEARCH_KEYWORDS": "weather,landscape",
-    "WEATHER_IMAGE_DOWNLOAD_PATH": "images/temperature_{rand}.jpg",
-    "WEATHER_IMAGE_UPLOAD_PATH": "weatherimages/{rand}.jpg",
-    "WEATHER_IMAGE_PROCESSOR_OPTIONS": "{\"resize\":{\"width\":800,\"height\":600},\"quality\":80}",
-    "IMAGE_OPTIMIZATION_LEVEL": "medium",
-    "UNSPLASH_ACCESS_KEY": "YOUR_UNSPLASH_ACCESS_KEY_HERE"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "StorageConnectionString": "UseDevelopmentStorage=true",
+    "BlobContainerName": "weather-images",
+    "WeatherStationsQueueName": "weather-stations-queue",
+    "ProcessImageQueueName": "process-image-queue",
+    "TableName": "JobStatus",
+    //"UnsplashAccessKey": "yxwZfofSf1xp7BIeYxTBkYIiQHYwVJr5tua_Njl4BE0", v1
+    "UnsplashAccessKey": "EafEqJ20-E_0UFxGXc-JywG5BJk5hn_WTnc6xdMn6OE", //v2
+    "Storage:IsEmulator": "true",
+    "Image:CacheControl": "no-cache, no-store, must-revalidate",
+    "ImageOverlay:WatermarkText": "© AbdelrahmanGhonim_695857",
+    "ImageOverlay:IncludeTimestamp": "true",
+    "ImageOverlay:WatermarkFontSize": "20",
+    "ImageOverlay:WatermarkOpacity": "0.75",
+    "ImageOverlay:FontFamily": "DejaVu Sans",
+    "ImageOverlay:FontSize": "48",
+    "Image:MaxWidth": "1280",
+    "Image:MaxHeight": "720",
+    "Image:Quality": "85",
+    "Image:UsePlaceholderOnError": "true",
+    "Image:PlaceholderColor": "#2d2d2d",
+    "Image:PlaceholderWidth": "1280",
+    "Image:PlaceholderHeight": "720",
+    "CityFilter:Strict": "false",
+    "CityFilter:FallbackMaxStations": "5",
+    "Unsplash:MaxRequestsPerJob": "45"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
   }
+
 }
 ```
 
@@ -342,5 +358,6 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 WeatherImageFunction/ ├── Functions/ │   ├── StartJobFunction.cs          # HTTP trigger to start a new job │   ├── GetResultsFunction.cs        # HTTP trigger to get job results │   ├── ListJobsFunction.cs          # HTTP trigger to list all jobs │   ├── FetchWeatherStationsFunction.cs  # Queue trigger to fetch weather data │   └── ProcessImageFunction.cs      # Queue trigger to process images ├── Services/ │   ├── IWeatherService.cs           # Weather service interface │   ├── WeatherService.cs            # Buienradar API integration │   ├── IImageService.cs             # Image service interface │   ├── ImageService.cs              # Unsplash API + image processing │   ├── IBlobStorageService.cs       # Blob storage interface │   ├── BlobStorageService.cs        # Azure Blob Storage operations │   ├── ITableStorageService.cs      # Table storage interface │   └── TableStorageService.cs       # Azure Table Storage operations ├── Models/ │   ├── JobStatus.cs                 # Job status entity │   ├── JobRequest.cs                # Job request model │   ├── JobResponse.cs               # Job response model │   ├── WeatherStation.cs            # Weather station model │   ├── WeatherStationsQueueMessage.cs │   └── ProcessImageQueueMessage.cs ├── Program.cs                       # DI container & app configuration ├── host.json                        # Function app settings ├── local.settings.json              # Local configuration (not in source control) └── README.md                        # This file
 
 ```
+
 
 
