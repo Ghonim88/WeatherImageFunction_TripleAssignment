@@ -162,19 +162,6 @@ Create or update `local.settings.json`:
 
 ### host.json Settings
 
-Key configuration in `host.json`:
-
-```json
-{
-  "version": "2.0",
-  "extensions": {
-    "queues": {
-      "messageEncoding": "none"
-    }
-  }
-}
-```
-
 **Important:** `"messageEncoding": "none"` is required for queue triggers to work properly with `BinaryData.FromString()` in .NET 8 isolated worker mode.
 
 This is crucial for .NET 8 isolated worker mode to properly deserialize queue messages.
@@ -198,35 +185,28 @@ Images are processed using SixLabors.ImageSharp:
 5. Save as JPEG
 6. Upload to Blob Storage
 
-## 🔐 Security Notes
-
-- Never commit `local.settings.json` to source control
-- Keep your Unsplash Access Key private
-- In production, use Azure Key Vault for secrets
-- Use managed identities for Azure resource access
-
-## 📄 License
-
-[Your License Here]
-
-## 👥 Contributors
-
-[Your Name/Team]
-
-## 🤝 Contributing
-
-[Contribution guidelines if applicable]
-
----
-
-**Made with ☁️ and ❤️ using Azure Functions**
 
 # Usage
 
 ### Starting a New Job
+## API Usage & Workflow
+### 1. Start a New Job (Local)
+```
+POST {{baseUrl}}/jobs
+Content-Type: application/json
 
+{
+  "searchKeyword": "netherlands",
+  "city": "Amsterdam",
+  "maxStations": 10
+}
+```
+### 2. Get Job Results by ID
+Replace with actual jobId from the previous response
+```
+GET {{baseUrl}}/jobs/3fa85f64-5717-4562-b3fc-2c963f66afa6
 To process weather data and generate images:
-
+```
 1. **Open Postman or any API client**
 2. **Create a POST request** to `http://localhost:7071/api/jobs`
 3. **Send** the request
@@ -355,9 +335,9 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 ## 📁 Project Structure
 
 ```
-WeatherImageFunction/ ├── Functions/ │   ├── StartJobFunction.cs          # HTTP trigger to start a new job │   ├── GetResultsFunction.cs        # HTTP trigger to get job results │   ├── ListJobsFunction.cs          # HTTP trigger to list all jobs │   ├── FetchWeatherStationsFunction.cs  # Queue trigger to fetch weather data │   └── ProcessImageFunction.cs      # Queue trigger to process images ├── Services/ │   ├── IWeatherService.cs           # Weather service interface │   ├── WeatherService.cs            # Buienradar API integration │   ├── IImageService.cs             # Image service interface │   ├── ImageService.cs              # Unsplash API + image processing │   ├── IBlobStorageService.cs       # Blob storage interface │   ├── BlobStorageService.cs        # Azure Blob Storage operations │   ├── ITableStorageService.cs      # Table storage interface │   └── TableStorageService.cs       # Azure Table Storage operations ├── Models/ │   ├── JobStatus.cs                 # Job status entity │   ├── JobRequest.cs                # Job request model │   ├── JobResponse.cs               # Job response model │   ├── WeatherStation.cs            # Weather station model │   ├── WeatherStationsQueueMessage.cs │   └── ProcessImageQueueMessage.cs ├── Program.cs                       # DI container & app configuration ├── host.json                        # Function app settings ├── local.settings.json              # Local configuration (not in source control) └── README.md                        # This file
 
 ```
+
 
 
 
