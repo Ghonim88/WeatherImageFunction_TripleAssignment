@@ -2,7 +2,7 @@
   "profiles": {
     "WeatherImageFunction": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7229",
+      "commandLineArgs": "--port 7071",
       "launchBrowser": false
     }
   }
