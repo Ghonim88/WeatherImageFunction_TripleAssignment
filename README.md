@@ -1,5 +1,3 @@
-Weather Image Function 
-
 # Weather Image Function
 
 An Azure Functions application that fetches weather station data from the Buienradar API, retrieves related images from Unsplash, overlays weather information on the images, and stores them in Azure Blob Storage.
