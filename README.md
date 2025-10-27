@@ -4,18 +4,6 @@
 
 An Azure Functions application that fetches weather station data from the Buienradar API, retrieves related images from Unsplash, overlays weather information on the images, and stores them in Azure Blob Storage.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-- [Configuration](#configuration)
-- [API Endpoints](#api-endpoints)
-- [Usage](#usage)
-- [Troubleshooting](#troubleshooting)
-- [Project Structure](#project-structure)
-- [Technologies](#technologies)
 
 ## ✨ Features
 
@@ -354,4 +342,5 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 WeatherImageFunction/ ├── Functions/ │   ├── StartJobFunction.cs          # HTTP trigger to start a new job │   ├── GetResultsFunction.cs        # HTTP trigger to get job results │   ├── ListJobsFunction.cs          # HTTP trigger to list all jobs │   ├── FetchWeatherStationsFunction.cs  # Queue trigger to fetch weather data │   └── ProcessImageFunction.cs      # Queue trigger to process images ├── Services/ │   ├── IWeatherService.cs           # Weather service interface │   ├── WeatherService.cs            # Buienradar API integration │   ├── IImageService.cs             # Image service interface │   ├── ImageService.cs              # Unsplash API + image processing │   ├── IBlobStorageService.cs       # Blob storage interface │   ├── BlobStorageService.cs        # Azure Blob Storage operations │   ├── ITableStorageService.cs      # Table storage interface │   └── TableStorageService.cs       # Azure Table Storage operations ├── Models/ │   ├── JobStatus.cs                 # Job status entity │   ├── JobRequest.cs                # Job request model │   ├── JobResponse.cs               # Job response model │   ├── WeatherStation.cs            # Weather station model │   ├── WeatherStationsQueueMessage.cs │   └── ProcessImageQueueMessage.cs ├── Program.cs                       # DI container & app configuration ├── host.json                        # Function app settings ├── local.settings.json              # Local configuration (not in source control) └── README.md                        # This file
 
 ```
+
 
