@@ -17,6 +17,51 @@ An Azure Functions application that fetches weather station data from the Buienr
 
 ## 🏗️ Architecture
 
+## 📁 Project Structure
+
+```
+ImageGenFunctions/
+│
+├── Bicep/
+│   ├── main.bicep
+|       
+├── DeplopymentTemplate/
+│   ├── deploy.ps1       
+│   ├── AzuriteConfig
+|    
+├── Functions/
+│   ├── FetchWeatherStationsFunction.cs       
+│   ├── GetResultsFunction.cs
+|   ├── ProcessImageFunction.cs
+|   ├── StartJobFunction.cs         
+│
+├── Http/
+│   ├── Api.http
+|
+├── Models/
+│   ├── BuienradarResponse.cs              
+│   ├── JobRequest.cs         
+│   ├── JobResponse.cs
+│   ├── JobState.cs         
+│   ├── JobStatus.cs         
+│   ├── ProcessImageQueueMessage.cs         
+│   ├── WeatherStation.cs         
+│   ├── WeatherStationsQueueMessage.cs                  
+│
+├── Services/
+│   ├── BlobStorageService.cs              
+│   ├── IBlobStorageService.cs         
+│   ├── IImageService.cs
+│   ├── ImageService.cs         
+│   ├── ITableStorageSerive.cs         
+│   ├── IWeatherService.cs         
+│   ├── TableSotrageService.cs         
+│   ├── WeatherService.cs
+├── local.settings.json               
+├── host.json
+├── Program.cs                                                  
+└── README.md                         
+```
 sequenceDiagram
     sequenceDiagram
     participant Client
@@ -333,52 +378,6 @@ Once the job is complete, you can also **click on the image URLs directly in you
 
 **Solution:**
 Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the latest secure version.
-
-## 📁 Project Structure
-
-```
-ImageGenFunctions/
-│
-├── Bicep/
-│   ├── main.bicep
-|       
-├── DeplopymentTemplate/
-│   ├── deploy.ps1       
-│   ├── AzuriteConfig
-|    
-├── Functions/
-│   ├── FetchWeatherStationsFunction.cs       
-│   ├── GetResultsFunction.cs
-|   ├── ProcessImageFunction.cs
-|   ├── StartJobFunction.cs         
-│
-├── Http/
-│   ├── Api.http
-|
-├── Models/
-│   ├── BuienradarResponse.cs              
-│   ├── JobRequest.cs         
-│   ├── JobResponse.cs
-│   ├── JobState.cs         
-│   ├── JobStatus.cs         
-│   ├── ProcessImageQueueMessage.cs         
-│   ├── WeatherStation.cs         
-│   ├── WeatherStationsQueueMessage.cs                  
-│
-├── Services/
-│   ├── BlobStorageService.cs              
-│   ├── IBlobStorageService.cs         
-│   ├── IImageService.cs
-│   ├── ImageService.cs         
-│   ├── ITableStorageSerive.cs         
-│   ├── IWeatherService.cs         
-│   ├── TableSotrageService.cs         
-│   ├── WeatherService.cs
-├── local.settings.json               
-├── host.json
-├── Program.cs                                                  
-└── README.md                         
-```
 
 
 
