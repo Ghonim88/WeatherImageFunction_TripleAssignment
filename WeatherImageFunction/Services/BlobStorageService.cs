@@ -28,16 +28,13 @@ public class BlobStorageService : IBlobStorageService
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
             
-            // Use public access for local development, private for production
+            // Public for emulator, private for Azure
             var publicAccessType = _blobServiceClient.Uri.Host.Contains("127.0.0.1") || _blobServiceClient.Uri.Host.Contains("localhost")
                 ? PublicAccessType.Blob
                 : PublicAccessType.None;
             
-            // Create container if it doesn't exist
             await containerClient.CreateIfNotExistsAsync(publicAccessType);
 
-            // IMPORTANT: Also update access policy if container already exists
-            // This ensures the permissions are correct even if the container was created earlier
             if (publicAccessType == PublicAccessType.Blob)
             {
                 await containerClient.SetAccessPolicyAsync(publicAccessType);
@@ -47,7 +44,6 @@ public class BlobStorageService : IBlobStorageService
             var blobClient = containerClient.GetBlobClient(blobName);
 
             using var stream = new MemoryStream(imageBytes);
-            
             var uploadOptions = new BlobUploadOptions
             {
                 HttpHeaders = new BlobHttpHeaders
@@ -56,12 +52,12 @@ public class BlobStorageService : IBlobStorageService
                 }
             };
             
-            await blobClient.UploadAsync(stream, uploadOptions, cancellationToken: default);
+            await blobClient.UploadAsync(stream, uploadOptions);
 
-            _logger.LogInformation("Uploaded blob: {BlobName} to container with public access: {PublicAccess}", blobName, publicAccessType);
+            _logger.LogInformation("Uploaded blob: {BlobName}", blobName);
 
-            // Return the blob URL
-            return blobClient.Uri.ToString();
+            // IMPORTANT: return SAS for Azure; direct URL for emulator per GetBlobSasUrlAsync
+            return await GetBlobSasUrlAsync(blobName);
         }
         catch (Exception ex)
         {
@@ -82,15 +78,14 @@ public class BlobStorageService : IBlobStorageService
                 throw new FileNotFoundException($"Blob {blobName} not found");
             }
 
-            // Check if using local development storage (Azurite)
+            // Emulator: return direct URL
             if (_blobServiceClient.Uri.Host.Contains("127.0.0.1") || _blobServiceClient.Uri.Host.Contains("localhost"))
             {
-                // For local development, return the direct blob URL
-                _logger.LogWarning("Using local storage emulator - returning direct blob URL without SAS");
+                _logger.LogInformation("Emulator detected - returning direct URL for {BlobName}", blobName);
                 return blobClient.Uri.ToString();
             }
 
-            // For Azure Storage, generate SAS URL
+            // Azure: generate SAS URL
             var sasBuilder = new BlobSasBuilder
             {
                 BlobContainerName = _containerName,
@@ -99,7 +94,6 @@ public class BlobStorageService : IBlobStorageService
                 StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
                 ExpiresOn = DateTimeOffset.UtcNow.AddHours(expiryHours)
             };
-
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
             var sasUrl = blobClient.GenerateSasUri(sasBuilder);
@@ -126,7 +120,6 @@ public class BlobStorageService : IBlobStorageService
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
             var blobClient = containerClient.GetBlobClient(blobName);
             await blobClient.DeleteIfExistsAsync();
-            
             _logger.LogInformation("Deleted blob: {BlobName}", blobName);
         }
         catch (Exception ex)

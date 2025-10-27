@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "namePrefix": {
+      "value": "weather"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "unsplashAccessKey": {
+      //"value": "yxwZfofSf1xp7BIeYxTBkYIiQHYwVJr5tua_Njl4BE0", v1
+      "value": "EafEqJ20-E_0UFxGXc-JywG5BJk5hn_WTnc6xdMn6OE" //v2
+    }
+  }
+}

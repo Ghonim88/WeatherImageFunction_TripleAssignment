@@ -1,9 +1,10 @@
 namespace WeatherImageFunction.Functions;
 
 using System;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using Azure.Storage.Queues;
-using Azure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ public class FetchWeatherStationsFunction
     private readonly IWeatherService _weatherService;
     private readonly ITableStorageService _tableStorageService;
     private readonly QueueClient _processImageQueueClient;
+    private readonly IConfiguration _configuration;
 
     public FetchWeatherStationsFunction(
         ILogger<FetchWeatherStationsFunction> logger,
@@ -27,6 +29,7 @@ public class FetchWeatherStationsFunction
         _logger = logger;
         _weatherService = weatherService;
         _tableStorageService = tableStorageService;
+        _configuration = configuration;
 
         var queueName = configuration["ProcessImageQueueName"] ?? "process-image-queue";
         _processImageQueueClient = queueServiceClient.GetQueueClient(queueName);
@@ -34,7 +37,6 @@ public class FetchWeatherStationsFunction
 
     [Function("FetchWeatherStations")]
     public async Task Run(
-        // define the queue trigger
         [QueueTrigger("weather-stations-queue", Connection = "StorageConnectionString")] string queueMessage)
     {
         string? jobId = null;
@@ -43,12 +45,9 @@ public class FetchWeatherStationsFunction
         {
             _logger.LogInformation("Processing weather stations queue message: {Message}", queueMessage);
 
-            // Ensure queue exists before using it
             await _processImageQueueClient.CreateIfNotExistsAsync();
 
-            // Deserialize queue message
             var message = JsonSerializer.Deserialize<WeatherStationsQueueMessage>(queueMessage);
-            
             if (message == null || string.IsNullOrWhiteSpace(message.JobId))
             {
                 _logger.LogError("Invalid queue message format");
@@ -57,7 +56,6 @@ public class FetchWeatherStationsFunction
 
             jobId = message.JobId;
 
-            // Update job status to Processing
             var jobStatus = await _tableStorageService.GetJobStatusAsync(jobId);
             if (jobStatus == null)
             {
@@ -70,8 +68,9 @@ public class FetchWeatherStationsFunction
 
             _logger.LogInformation("Fetching weather stations for job {JobId}", jobId);
 
-            // Fetch weather stations from Buienradar API
-            var stations = await _weatherService.GetWeatherStationsAsync(message.MaxStations);
+            // Pull extra to allow filtering
+            var fetchCount = Math.Max(message.MaxStations, 200);
+            var stations = await _weatherService.GetWeatherStationsAsync(fetchCount);
 
             if (stations.Count == 0)
             {
@@ -83,18 +82,73 @@ public class FetchWeatherStationsFunction
                 return;
             }
 
-            // Update total stations count
-            jobStatus.TotalStations = stations.Count;
+            var strictMatch = bool.TryParse(_configuration["CityFilter:Strict"], out var s) && s;
+            var fallbackMax = int.TryParse(_configuration["CityFilter:FallbackMaxStations"], out var fcap) ? Math.Max(0, fcap) : 5;
+            var unsplashMax = int.TryParse(_configuration["Unsplash:MaxRequestsPerJob"], out var ucap) ? Math.Max(1, ucap) : 45;
+
+            var filtered = stations;
+
+            if (!string.IsNullOrWhiteSpace(message.City))
+            {
+                var cityNorm = NormalizeForCompare(message.City);
+                _logger.LogInformation("City filter requested: '{City}' (normalized: '{CityNorm}')", message.City, cityNorm);
+
+                // 1) Exact-first on regio
+                var exactRegion = stations
+                    .Where(s => NormalizeForCompare(s.Region) == cityNorm)
+                    .ToList();
+
+                // 2) If no exact, try contains on regio or stationname
+                if (exactRegion.Count == 0)
+                {
+                    var contains = stations.Where(s =>
+                    {
+                        var nameNorm = NormalizeForCompare(s.Name);
+                        var regionNorm = NormalizeForCompare(s.Region);
+                        return (!string.IsNullOrEmpty(regionNorm) && regionNorm.Contains(cityNorm))
+                               || (!string.IsNullOrEmpty(nameNorm) && nameNorm.Contains(cityNorm));
+                    }).ToList();
+
+                    filtered = contains;
+                }
+                else
+                {
+                    filtered = exactRegion;
+                }
+
+                // 3) If still none, strict or capped fallback
+                if (filtered.Count == 0)
+                {
+                    if (strictMatch)
+                    {
+                        _logger.LogWarning("No stations matched city '{City}' for job {JobId}; strict mode -> failing job.", message.City, jobId);
+                        jobStatus.Status = JobState.Failed;
+                        jobStatus.ErrorMessage = $"No stations matched city '{message.City}'.";
+                        jobStatus.CompletedAt = DateTime.UtcNow;
+                        await _tableStorageService.UpdateJobStatusAsync(jobStatus);
+                        return;
+                    }
+
+                    _logger.LogWarning("No stations matched city '{City}' for job {JobId}. Falling back with cap {Cap}.", message.City, jobId, fallbackMax);
+                    filtered = stations.Take(Math.Max(0, fallbackMax)).ToList();
+                }
+            }
+
+            // Enforce per-job cap and requested cap
+            var hardCap = Math.Max(1, Math.Min(message.MaxStations, unsplashMax));
+            var toQueue = filtered.Take(hardCap).ToList();
+
+            // Log what we matched (first 5) for debugging
+            var peek = string.Join(" | ", toQueue.Take(5).Select(s => $"{s.Name} ({s.Region})"));
+            _logger.LogInformation("Matched {Count} stations. Sample: {Sample}", toQueue.Count, peek);
+
+            jobStatus.TotalStations = toQueue.Count;
             await _tableStorageService.UpdateJobStatusAsync(jobStatus);
 
-            _logger.LogInformation(
-                "Found {Count} weather stations for job {JobId}. Queuing image processing tasks...",
-                stations.Count,
-                jobId);
+            _logger.LogInformation("Queuing {Count} image processing tasks for job {JobId}", toQueue.Count, jobId);
 
-            // Queue individual image processing tasks
             var queueTasks = new List<Task>();
-            foreach (var station in stations)
+            foreach (var station in toQueue)
             {
                 var imageMessage = new ProcessImageQueueMessage
                 {
@@ -109,16 +163,12 @@ public class FetchWeatherStationsFunction
                 };
 
                 var imageMessageJson = JsonSerializer.Serialize(imageMessage);
-                // Use BinaryData for proper encoding
                 queueTasks.Add(_processImageQueueClient.SendMessageAsync(BinaryData.FromString(imageMessageJson)));
             }
 
             await Task.WhenAll(queueTasks);
 
-            _logger.LogInformation(
-                "Successfully queued {Count} image processing tasks for job {JobId}",
-                stations.Count,
-                jobId);
+            _logger.LogInformation("Successfully queued {Count} image processing tasks for job {JobId}", toQueue.Count, jobId);
         }
         catch (JsonException ex)
         {
@@ -147,5 +197,24 @@ public class FetchWeatherStationsFunction
                 }
             }
         }
+    }
+
+    private static string NormalizeForCompare(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+
+        // Strip diacritics
+        var formD = value.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder(formD.Length);
+        foreach (var ch in formD)
+        {
+            var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
+            if (uc != UnicodeCategory.NonSpacingMark) sb.Append(ch);
+        }
+        var noDiacritics = sb.ToString().Normalize(NormalizationForm.FormC);
+
+        // Drop punctuation/whitespace, lower-case
+        var cleaned = new string(noDiacritics.Where(c => !char.IsPunctuation(c) && !char.IsWhiteSpace(c)).ToArray());
+        return cleaned.ToLowerInvariant();
     }
 }

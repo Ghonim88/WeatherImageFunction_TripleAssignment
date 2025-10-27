@@ -1,0 +1,71 @@
+﻿### Weather Image Function API
+# This file documents the available HTTP endpoints and example requests.
+# Auth: Functions use AuthorizationLevel.Function. Provide the key via:
+# - Query: ?code={functionKey}
+# - OR Header: x-functions-key: {functionKey}
+
+### Variables (set your keys and deployed app URL)
+@localBase = http://localhost:7071/api
+@localFunctionKey = your-local-function-key
+
+@prodBase = https://your-function-app.azurewebsites.net/api
+@prodFunctionKey = your-production-function-key
+
+#######################################################################
+# LOCAL ENVIRONMENT
+#######################################################################
+
+### 1) Start a new job (Local)
+# Returns: 202 Accepted + { jobId, status, createdAt, message }
+# Body fields:
+# - searchKeyword (required): Unsplash query (e.g., "netherlands", "landscape, clouds")
+# - city (optional): best-effort filter against Buienradar station "regio" / "stationname"
+# - maxStations (required 1..100): upper bound of stations/images to process
+POST {{localBase}}/jobs?code={{localFunctionKey}}
+Content-Type: application/json
+
+{
+  "searchKeyword": "netherlands",
+  "city": "rotterdam",
+  "maxStations": 10
+}
+
+### 2) Get job status + image URLs by JobId (Local)
+# Replace {jobId} with the value returned by the POST above.
+# Returns: 200 OK + status, progress, imageUrls (direct URLs on Azurite)
+GET {{localBase}}/jobs/{jobId}?code={{localFunctionKey}}
+
+### Alternative auth (Local): header instead of query
+# GET {{localBase}}/jobs/{jobId}
+# x-functions-key: {{localFunctionKey}}
+
+#######################################################################
+# PRODUCTION (AZURE)
+#######################################################################
+
+### 3) Start a new job (Production)
+# Returns: 202 Accepted + { jobId, status, createdAt, message }
+POST {{prodBase}}/jobs?code={{prodFunctionKey}}
+Content-Type: application/json
+
+{
+  "searchKeyword": "netherlands",
+  "city": "Rotterdam",
+  "maxStations": 20
+}
+
+### 4) Get job status + image URLs by JobId (Production)
+# Returns: 200 OK + status, progress, imageUrls (SAS URLs in Azure)
+GET {{prodBase}}/jobs/{jobId}?code={{prodFunctionKey}}
+
+### Alternative auth (Production): header instead of query
+# GET {{prodBase}}/jobs/{jobId}
+# x-functions-key: {{prodFunctionKey}}
+
+#######################################################################
+# Notes
+# - Locally (Azurite): image URLs are direct and require the container to be public.
+# - In Azure: image URLs include SAS (time-limited). You can adjust SAS lifetime in code.
+# - City matching is best-effort against Buienradar fields (regio, stationname).
+#   If no match and strict=false, a small capped fallback set will be processed.
+# - Typical statuses: Pending → Processing → Completed (or Failed with errorMessage).

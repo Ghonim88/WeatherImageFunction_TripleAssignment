@@ -1,0 +1,37 @@
+﻿### Variables
+@baseUrl = http://localhost:7071/api
+@functionKey = your-function-key-here
+
+### 1. Start a new job
+POST {{baseUrl}}/jobs
+Content-Type: application/json
+
+{
+  "searchKeyword": "netherlands",
+  "city": "Amsterdam",
+  "maxStations": 10
+}
+
+### 2. Get job results by ID
+# Replace with actual jobId from the previous response
+GET {{baseUrl}}/jobs/3fa85f64-5717-4562-b3fc-2c963f66afa6
+
+### 3. List all jobs
+GET {{baseUrl}}/jobs?top=20
+
+### Production URLs (after deployment)
+@prodBaseUrl = https://your-function-app.azurewebsites.net/api
+@prodFunctionKey = your-production-function-key
+
+### 4. Start job (Production)
+POST {{prodBaseUrl}}/jobs?code={{prodFunctionKey}}
+Content-Type: application/json
+
+{
+  "searchKeyword": "netherlands",
+  "city": "Rotterdam",
+  "maxStations": 50
+}
+
+### 5. Get job results (Production)
+GET {{prodBaseUrl}}/jobs/your-job-id?code={{prodFunctionKey}}

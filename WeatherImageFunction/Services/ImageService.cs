@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,6 @@ using SixLabors.Fonts;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using WeatherImageFunction.Models;
-using SixLabors.ImageSharp.Drawing; // for gradients if desired
 
 namespace WeatherImageFunction.Services;
 
@@ -39,40 +39,49 @@ public class ImageService : IImageService
         {
             var unsplashAccessKey = _configuration["UnsplashAccessKey"];
             if (string.IsNullOrEmpty(unsplashAccessKey))
-            {
                 throw new InvalidOperationException("Unsplash Access Key is not configured");
+
+            var url = $"https://api.unsplash.com/photos/random?query={Uri.EscapeDataString(searchKeyword)}";
+
+            // Build request with official headers instead of client_id query
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            req.Headers.Add("Accept-Version", "v1");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Client-ID", unsplashAccessKey);
+
+            var metaResponse = await _httpClient.SendAsync(req);
+            if (metaResponse.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                LogUnsplashRate(metaResponse);
+                metaResponse.EnsureSuccessStatusCode(); // will throw 403 with context
             }
-
-            var searchUrl = $"https://api.unsplash.com/photos/random?query={Uri.EscapeDataString(searchKeyword)}&client_id={unsplashAccessKey}";
-            _logger.LogInformation("Fetching image from Unsplash with keyword: {Keyword}", searchKeyword);
-
-            using var metaResponse = await GetWithRetryAsync(searchUrl);
             metaResponse.EnsureSuccessStatusCode();
 
             var content = await metaResponse.Content.ReadAsStringAsync();
             var imageData = JsonSerializer.Deserialize<UnsplashResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (imageData?.Urls?.Regular == null)
-            {
                 throw new InvalidOperationException("No image URL found in Unsplash response");
+
+            // Download the actual image bytes
+            var imgResp = await _httpClient.GetAsync(imageData.Urls.Regular);
+            imgResp.EnsureSuccessStatusCode();
+            var bytes = await imgResp.Content.ReadAsByteArrayAsync();
+
+            if (bytes == null || bytes.Length == 0 || !CanDecodeImage(bytes))
+            {
+                _logger.LogWarning("Unsplash returned empty or undecodable image. Falling back to placeholder.");
+                return await CreatePlaceholderOrThrowAsync();
             }
 
-            using var imageResponse = await GetWithRetryAsync(imageData.Urls.Regular);
-            imageResponse.EnsureSuccessStatusCode();
-
-            return await imageResponse.Content.ReadAsByteArrayAsync();
+            return bytes;
         }
         catch (Exception ex)
         {
-            // Fallback if enabled
-            var useFallback = GetConfigBool("Image:UsePlaceholderOnError", true);
-            if (useFallback)
+            if (GetConfigBool("Image:UsePlaceholderOnError", true))
             {
                 _logger.LogWarning(ex, "Falling back to placeholder image due to Unsplash error.");
-                var width = GetConfigInt("Image:PlaceholderWidth", GetConfigInt("Image:MaxWidth", 1280));
-                var height = GetConfigInt("Image:PlaceholderHeight", GetConfigInt("Image:MaxHeight", 720));
-                var color = ParseRgba(_configuration["Image:PlaceholderColor"]) ?? new Rgba32(45, 45, 45);
-                return await CreatePlaceholderImageAsync(width, height, color);
+                return await CreatePlaceholderOrThrowAsync();
             }
 
             _logger.LogError(ex, "Failed to fetch image and fallback is disabled.");
@@ -80,10 +89,21 @@ public class ImageService : IImageService
         }
     }
 
-    // replace CreatePlaceholderImageAsync with a more explicit placeholder
-    private async Task<byte[]> CreatePlaceholderImageAsync(int width, int height, Rgba32 bg)
+    private void LogUnsplashRate(HttpResponseMessage resp)
     {
-        using var img = new Image<Rgba32>(width, height, bg);
+        var limit = resp.Headers.TryGetValues("X-Ratelimit-Limit", out var lim) ? lim.FirstOrDefault() : "unknown";
+        var remaining = resp.Headers.TryGetValues("X-Ratelimit-Remaining", out var rem) ? rem.FirstOrDefault() : "unknown";
+        _logger.LogWarning("Unsplash 403. X-Ratelimit-Limit={Limit}, X-Ratelimit-Remaining={Remaining}", limit, remaining);
+    }
+
+    // replace CreatePlaceholderImageAsync with a more explicit placeholder
+    private async Task<byte[]> CreatePlaceholderOrThrowAsync()
+    {
+        var width = GetConfigInt("Image:PlaceholderWidth", GetConfigInt("Image:MaxWidth", 1280));
+        var height = GetConfigInt("Image:PlaceholderHeight", GetConfigInt("Image:MaxHeight", 720));
+        var color = ParseRgba(_configuration["Image:PlaceholderColor"]) ?? new Rgba32(45, 45, 45);
+
+        using var img = new Image<Rgba32>(width, height, color);
 
         var label = _configuration["Image:PlaceholderLabel"] ?? "No image available";
         var fontSize = GetConfigFloat("ImageOverlay:FontSize", 48f);
@@ -131,39 +151,45 @@ public class ImageService : IImageService
                 });
             }
 
-            // Prepare weather text overlay
+            // Build overlay text (optionally include region)
+            var includeRegion = GetConfigBool("ImageOverlay:IncludeRegion", false);
+            var nameLine = includeRegion && !string.IsNullOrWhiteSpace(station.Region)
+                ? $"{station.Name} ({station.Region})"
+                : station.Name;
             var tempText = station.Temperature.HasValue ? $"{station.Temperature:F1}°C" : "N/A";
-            var overlayText = $"{station.Name}\n{tempText}";
+            var overlayText = $"{nameLine}\n{tempText}";
 
-            // Configurable font (fallbacks for Linux containers)
+            // Fonts
             var overlayFontSize = GetConfigFloat("ImageOverlay:FontSize", 48f);
             var overlayFont = GetConfiguredFont(overlayFontSize, FontStyle.Bold);
 
-            var textOptions = new RichTextOptions(overlayFont)
-            {
-                Origin = new SixLabors.ImageSharp.PointF(20, image.Height - (overlayFontSize * 2.8f)),
-                WrappingLength = image.Width - 40,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
+            // Compute bottom band safely within bounds
+            var bandHeight = Math.Max(overlayFontSize * 3.0f, overlayFontSize + 20);
+            var bandY = Math.Max(0, image.Height - bandHeight - 10);
+            var bandRect = new RectangleF(0, bandY, image.Width, Math.Min(image.Height - bandY, bandHeight + 10));
 
-            // Add semi-transparent background for main overlay
             image.Mutate(ctx =>
             {
-                var bgHeight = overlayFontSize * 3.0f;
-                ctx.Fill(new Color(new Rgba32(0, 0, 0, 180)),
-                    new RectangleF(0, image.Height - bgHeight - 10, image.Width, bgHeight + 10));
+                ctx.Fill(new Color(new Rgba32(0, 0, 0, 180)), bandRect);
+
+                var textOptions = new RichTextOptions(overlayFont)
+                {
+                    Origin = new SixLabors.ImageSharp.PointF(20, Math.Max(0, bandRect.Y + 10)),
+                    WrappingLength = Math.Max(20, image.Width - 40),
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
                 ctx.DrawText(textOptions, overlayText, Color.White);
             });
 
-            // Optional: watermark and/or timestamp (bottom-right)
+            // Watermark + timestamp (place just above band to avoid overlap)
             var watermarkText = _configuration["ImageOverlay:WatermarkText"];
             var includeTimestamp = GetConfigBool("ImageOverlay:IncludeTimestamp", true);
             if (!string.IsNullOrWhiteSpace(watermarkText) || includeTimestamp)
             {
                 var tzId = _configuration["ImageOverlay:TimeZoneId"] ?? "Europe/Amsterdam";
-                var tz = TryGetTimeZone(tzId) ?? TryGetTimeZone("W. Europe Standard Time"); // Windows fallback
+                var tz = TryGetTimeZone(tzId) ?? TryGetTimeZone("W. Europe Standard Time");
                 var localNow = tz != null ? TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz) : DateTime.UtcNow;
-                var ts = includeTimestamp ? localNow.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + (tz != null ? $" {tz.StandardName}" : " UTC") : null;
+                var ts = includeTimestamp ? localNow.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) : null;
                 var combined = string.Join(" · ", new[] { watermarkText, ts }.Where(x => !string.IsNullOrWhiteSpace(x)));
 
                 if (!string.IsNullOrWhiteSpace(combined))
@@ -175,18 +201,19 @@ public class ImageService : IImageService
                     var measureOptions = new TextOptions(watermarkFont);
                     var textSize = TextMeasurer.MeasureSize(combined, measureOptions);
 
-                    var position = new SixLabors.ImageSharp.PointF(
-                        image.Width - (float)textSize.Width - padding,
-                        image.Height - (float)textSize.Height - padding
-                    );
+                    // place above the band to avoid collision
+                    var targetBottom = (float)Math.Max(0, bandRect.Y - 8);
+                    var posX = Math.Max(0, image.Width - (float)textSize.Width - padding);
+                    var posY = Math.Max(0, targetBottom - (float)textSize.Height - padding);
+                    var position = new SixLabors.ImageSharp.PointF(posX, posY);
 
                     image.Mutate(ctx =>
                     {
                         var rect = new RectangleF(
-                            position.X - 8,
-                            position.Y - 4,
-                            (float)textSize.Width + 16,
-                            (float)textSize.Height + 8);
+                            Math.Max(0, position.X - 8),
+                            Math.Max(0, position.Y - 4),
+                            Math.Min(image.Width, (float)textSize.Width + 16),
+                            Math.Min(image.Height, (float)textSize.Height + 8));
                         ctx.Fill(new Color(new Rgba32(0, 0, 0, 120)), rect);
                         ctx.DrawText(combined, watermarkFont, Color.White.WithAlpha(GetConfigFloat("ImageOverlay:WatermarkOpacity", 0.75f)), position);
                     });
@@ -355,5 +382,19 @@ public class ImageService : IImageService
     {
         try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
         catch { return null; }
+    }
+
+    private bool CanDecodeImage(byte[] bytes)
+    {
+        try
+        {
+            using var stream = new MemoryStream(bytes);
+            using var image = Image.Load<Rgba32>(stream);
+            return image != null && image.Width > 0 && image.Height > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
