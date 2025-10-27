@@ -119,8 +119,8 @@ Create or update `local.settings.json`:
     "WeatherStationsQueueName": "weather-stations-queue",
     "ProcessImageQueueName": "process-image-queue",
     "TableName": "JobStatus",
-    //"UnsplashAccessKey": "yxwZfofSf1xp7BIeYxTBkYIiQHYwVJr5tua_Njl4BE0", v1
-    "UnsplashAccessKey": "EafEqJ20-E_0UFxGXc-JywG5BJk5hn_WTnc6xdMn6OE", //v2
+    //"UnsplashAccessKey": "yxwZfofSf1xp7BIeYxTBkYIiQHYwVJr5tua_Njl4BE0", v1 in case you don't have one
+    "UnsplashAccessKey": "EafEqJ20-E_0UFxGXc-JywG5BJk5hn_WTnc6xdMn6OE", //v2 backup because of the limited request per hour
     "Storage:IsEmulator": "true",
     "Image:CacheControl": "no-cache, no-store, must-revalidate",
     "ImageOverlay:WatermarkText": "© AbdelrahmanGhonim_695857",
@@ -339,6 +339,7 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 ```
 
 ```
+
 
 
 
