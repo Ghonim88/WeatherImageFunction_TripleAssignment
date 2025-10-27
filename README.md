@@ -63,7 +63,6 @@ ImageGenFunctions/
 └── README.md                         
 ```
 ### sequenceDiagram
-    sequenceDiagram
     participant Client
     participant StartJob as StartJobFunction
     participant Queue1 as weather-stations-queue
@@ -378,6 +377,7 @@ Once the job is complete, you can also **click on the image URLs directly in you
 
 **Solution:**
 Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the latest secure version.
+
 
 
 
