@@ -18,6 +18,7 @@ An Azure Functions application that fetches weather station data from the Buienr
 ## 🏗️ Architecture
 
 sequenceDiagram
+    sequenceDiagram
     participant Client
     participant StartJob as StartJobFunction
     participant Queue1 as weather-stations-queue
@@ -53,6 +54,7 @@ sequenceDiagram
     Client->>StartJob: GET /api/jobs/{jobId}
     StartJob->>Table: Get JobStatus
     StartJob-->>Client: 200 OK (status + image URLs)
+
 
 ## 📦 Prerequisites
 
@@ -337,6 +339,7 @@ Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the lates
 ```
 
 ```
+
 
 
 
