@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="publish\**" />
+    <EmbeddedResource Remove="publish\**" />
+    <None Remove="publish\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Http\Api.http" />
   </ItemGroup>
 
@@ -18,7 +24,8 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" />
+    <!-- Ensure the SDK runs as an analyzer so functions.metadata is generated -->
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" OutputItemType="Analyzer" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="artifacts\" />
     <Folder Include="Bicep\" />
   </ItemGroup>
-
 </Project>
