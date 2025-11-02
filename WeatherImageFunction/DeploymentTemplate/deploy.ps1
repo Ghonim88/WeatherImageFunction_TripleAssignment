@@ -186,15 +186,6 @@ $storageAccountName  = $deployment.Outputs.storageAccountName.Value
 Write-Host "Function App Name: $functionAppName" -ForegroundColor Cyan
 Write-Host "Function App URL:  $functionAppUrl" -ForegroundColor Cyan
 
-# Ensure AzureWebJobsStorage connection string
-Write-Host "Ensuring AzureWebJobsStorage is a connection string..." -ForegroundColor Yellow
-$storageKey = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroupName -Name $storageAccountName)[0].Value
-$endpointSuffix = (Get-AzContext).Environment.StorageEndpointSuffix
-$azureWebJobsConn = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=$endpointSuffix"
-Set-AzWebApp -ResourceGroupName $ResourceGroupName -Name $functionAppName -AppSettings @{
-  AzureWebJobsStorage = $azureWebJobsConn
-} | Out-Null
-
 # Build and publish Function App
 Write-Host "`nBuilding and packaging Function App..." -ForegroundColor Yellow
 Push-Location $projectDir
@@ -223,6 +214,7 @@ New-Zip -sourceDir $publishFolder -destZip $zipPath
 
 # Upload package and set WEBSITE_RUN_FROM_PACKAGE
 Write-Host "Uploading package to Storage and updating WEBSITE_RUN_FROM_PACKAGE..." -ForegroundColor Yellow
+$storageKey = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroupName -Name $storageAccountName)[0].Value
 $ctx = New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageKey
 $containerName = "functionpackages"
 $null = New-AzStorageContainer -Name $containerName -PublicAccess Off -Context $ctx -ErrorAction SilentlyContinue
@@ -241,16 +233,25 @@ $sasUri = (New-AzStorageBlobSASToken `
     -Context $ctx
 ).ToString()
 
-# Update Function App settings
-$settings = New-Object 'System.Collections.Generic.Dictionary[string,string]'
-$settings.Add('AzureWebJobsStorage', [string]$azureWebJobsConn)
-$settings.Add('WEBSITE_RUN_FROM_PACKAGE', [string]$sasUri)
+# Update Function App settings - preserve existing settings
+Write-Host "Updating Function App settings..." -ForegroundColor Yellow
+$currentSettings = (Get-AzWebApp -ResourceGroupName $ResourceGroupName -Name $functionAppName).SiteConfig.AppSettings
+$settingsHash = @{}
+foreach ($setting in $currentSettings) {
+    $settingsHash[$setting.Name] = $setting.Value
+}
+$settingsHash['WEBSITE_RUN_FROM_PACKAGE'] = $sasUri
 
-Set-AzWebApp -ResourceGroupName $ResourceGroupName -Name $functionAppName -AppSettings $settings | Out-Null
+Set-AzWebApp -ResourceGroupName $ResourceGroupName -Name $functionAppName -AppSettings $settingsHash | Out-Null
 
 # Restart Function App
+Write-Host "Restarting Function App..." -ForegroundColor Yellow
 Restart-AzWebApp -ResourceGroupName $ResourceGroupName -Name $functionAppName | Out-Null
 
 Write-Host "`nDeployment completed successfully!" -ForegroundColor Green
 Write-Host "Function App URL: $functionAppUrl" -ForegroundColor Cyan
-Write-Host "Note: To silence Bicep warnings, remove unnecessary 'dependsOn' entries in the template." -ForegroundColor DarkYellow
+Write-Host "`nQueue Names:" -ForegroundColor Cyan
+Write-Host "  - job-queue (for starting jobs)" -ForegroundColor White
+Write-Host "  - image-process-queue (for processing images)" -ForegroundColor White
+Write-Host "`nBlob Container:" -ForegroundColor Cyan
+Write-Host "  - weather-images (for storing generated images)" -ForegroundColor White
