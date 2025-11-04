@@ -1,0 +1,46 @@
+﻿name: Deploy Azure Function App
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  # 👇 Change these to match your Azure setup
+  AZURE_FUNCTIONAPP_NAME: 'weather-func-dev-bzp224wiyrn54'     # Your Function App name in Azure
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'WeatherImageFunction'       # Path to your .csproj folder
+  DOTNET_VERSION: '8.0.x'                                      # Target .NET version
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    environment: dev
+
+    steps:
+    # Step 1: Checkout your code
+    - name: 'Checkout repository'
+      uses: actions/checkout@v4
+
+    # Step 2: Setup .NET environment
+    - name: 'Setup .NET ${{ env.DOTNET_VERSION }}'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Step 3: Restore, build, and publish your Azure Function project
+    - name: 'Build and publish the Azure Function project'
+      shell: pwsh
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+        dotnet publish --configuration Release --output ./output --no-build
+        popd
+
+    # Step 4: Deploy to Azure using your publish profile secret
+    - name: 'Deploy to Azure Function App'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
