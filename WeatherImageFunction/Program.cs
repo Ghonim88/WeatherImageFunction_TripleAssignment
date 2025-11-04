@@ -18,28 +18,28 @@ builder.Services
     .ConfigureFunctionsApplicationInsights();
 
 // Configuration
+// Use AzureWebJobsStorage as primary; fall back to StorageConnectionString if present
 var configuration = builder.Configuration;
 
-// Azure Storage Services
 builder.Services.AddSingleton(sp =>
 {
-    var connectionString = configuration["StorageConnectionString"]
-        ?? throw new InvalidOperationException("StorageConnectionString is not configured");
-    return new BlobServiceClient(connectionString);
+    var cs = configuration["AzureWebJobsStorage"] ?? configuration["StorageConnectionString"]
+        ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured");
+    return new BlobServiceClient(cs);
 });
 
 builder.Services.AddSingleton(sp =>
 {
-    var connectionString = configuration["StorageConnectionString"]
-        ?? throw new InvalidOperationException("StorageConnectionString is not configured");
-    return new QueueServiceClient(connectionString);
+    var cs = configuration["AzureWebJobsStorage"] ?? configuration["StorageConnectionString"]
+        ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured");
+    return new QueueServiceClient(cs);
 });
 
 builder.Services.AddSingleton(sp =>
 {
-    var connectionString = configuration["StorageConnectionString"]
-        ?? throw new InvalidOperationException("StorageConnectionString is not configured");
-    return new TableServiceClient(connectionString);
+    var cs = configuration["AzureWebJobsStorage"] ?? configuration["StorageConnectionString"]
+        ?? throw new InvalidOperationException("AzureWebJobsStorage is not configured");
+    return new TableServiceClient(cs);
 });
 
 // HttpClient for external API calls

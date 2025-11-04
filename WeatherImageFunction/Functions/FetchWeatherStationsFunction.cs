@@ -37,7 +37,7 @@ public class FetchWeatherStationsFunction
 
     [Function("FetchWeatherStations")]
     public async Task Run(
-        [QueueTrigger("weather-stations-queue", Connection = "StorageConnectionString")] string queueMessage)
+        [QueueTrigger("weather-stations-queue", Connection = "AzureWebJobsStorage")] string queueMessage)
     {
         string? jobId = null;
 
