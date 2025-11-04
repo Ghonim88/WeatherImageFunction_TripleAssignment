@@ -14,7 +14,6 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.2" />
-    <!-- Critical: make the Worker.Sdk an Analyzer so functions.metadata is emitted -->
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" OutputItemType="Analyzer" PrivateAssets="all" />
   </ItemGroup>
 
@@ -30,4 +29,5 @@
   <ItemGroup>
     <Folder Include="artifacts\" />
   </ItemGroup>
+
 </Project>
