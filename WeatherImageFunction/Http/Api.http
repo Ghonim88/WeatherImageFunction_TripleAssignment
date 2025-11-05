@@ -3,6 +3,7 @@
 @functionKey = your-function-key-here
 
 ### 1. Start a new job
+### url from azure function: https://weather-func-dev-bzp224wiyrn54.azurewebsites.net/api/jobs?code=nvUE0StOpyhYilZ00oCM13xrgg_nbj0VJuEnFuWIQHvAAzFuigZ-DQ==
 POST {{baseUrl}}/jobs
 Content-Type: application/json
 
@@ -14,7 +15,8 @@ Content-Type: application/json
 
 ### 2. Get job results by ID
 # Replace with actual jobId from the previous response
-GET {{baseUrl}}/jobs/3fa85f64-5717-4562-b3fc-2c963f66afa6
+# url from azure function: https://weather-func-dev-bzp224wiyrn54.azurewebsites.net/api/jobs/{jobId}?code=od0JFf1oOnnPsj-g65B4IeaO0UxEqym91wAcdBOEM2UCAzFuSghVeA==
+GET {{baseUrl}}/jobs
 
 ### 3. List all jobs
 GET {{baseUrl}}/jobs?top=20
