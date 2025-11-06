@@ -290,47 +290,6 @@ public class ImageService : IImageService
         }
     }
 
-    private async Task<HttpResponseMessage> GetWithRetryAsync(string url, int maxAttempts = 3)
-    {
-        var delay = TimeSpan.FromSeconds(1);
-        for (var attempt = 1; attempt <= maxAttempts; attempt++)
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync(url);
-
-                if ((int)response.StatusCode == 429)
-                {
-                    var ra = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(Math.Min(30, delay.TotalSeconds * 2));
-                    _logger.LogWarning("Rate limited by Unsplash (429). Retrying after {Delay}s (attempt {Attempt}/{Max})",
-                        ra.TotalSeconds, attempt, maxAttempts);
-                    await Task.Delay(ra);
-                    continue;
-                }
-
-                if ((int)response.StatusCode >= 500 && attempt < maxAttempts)
-                {
-                    _logger.LogWarning("Server error {Status}. Retrying in {Delay}s (attempt {Attempt}/{Max})",
-                        response.StatusCode, delay.TotalSeconds, attempt, maxAttempts);
-                    await Task.Delay(delay);
-                    delay = TimeSpan.FromSeconds(delay.TotalSeconds * 2);
-                    continue;
-                }
-
-                return response;
-            }
-            catch (HttpRequestException ex) when (attempt < maxAttempts)
-            {
-                _logger.LogWarning(ex, "HTTP request failed. Retrying in {Delay}s (attempt {Attempt}/{Max})",
-                    delay.TotalSeconds, attempt, maxAttempts);
-                await Task.Delay(delay);
-                delay = TimeSpan.FromSeconds(delay.TotalSeconds * 2);
-            }
-        }
-
-        return await _httpClient.GetAsync(url);
-    }
-
     private int GetConfigInt(string key, int @default)
         => int.TryParse(_configuration[key], out var val) ? val : @default;
 
