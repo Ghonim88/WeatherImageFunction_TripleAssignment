@@ -60,43 +60,6 @@ ImageGenFunctions/
 ├── Program.cs                                                  
 └── README.md                         
 ```
-### sequenceDiagram
-    participant Client
-    participant StartJob as StartJobFunction
-    participant Queue1 as weather-stations-queue
-    participant FetchStations as FetchWeatherStationsFunction
-    participant Queue2 as process-image-queue
-    participant ProcessImage as ProcessImageFunction
-    participant Table as Table Storage
-    participant Blob as Blob Storage
-
-    Client->>StartJob: POST /api/jobs
-    StartJob->>Table: Create JobStatus (Pending)
-    StartJob->>Queue1: Queue message
-    StartJob-->>Client: 202 Accepted (JobId)
-    
-    Queue1->>FetchStations: Trigger
-    FetchStations->>Table: Update status (Processing)
-    FetchStations->>FetchStations: Fetch 50 stations from Buienradar
-    loop For each station
-        FetchStations->>Queue2: Queue station message
-    end
-    
-    loop For each queued station
-        Queue2->>ProcessImage: Trigger
-        ProcessImage->>ProcessImage: Fetch image from Unsplash
-        ProcessImage->>ProcessImage: Add weather overlay
-        ProcessImage->>Blob: Upload image
-        Blob-->>ProcessImage: SAS URL
-        ProcessImage->>Table: Add image URL, increment counter
-    end
-    
-    ProcessImage->>Table: Update status (Completed)
-    
-    Client->>StartJob: GET /api/jobs/{jobId}
-    StartJob->>Table: Get JobStatus
-    StartJob-->>Client: 200 OK (status + image URLs)
-
 
 ## 📦 Prerequisites
 
@@ -191,196 +154,134 @@ Create or update `local.settings.json`:
 }
 ```
 
-### 6. Get Your Unsplash API Key
+## ✅ Features & Requirements (All Completed)
+### ✅ 1. Build and Deploy Automatically from GitHub (CI/CD)
 
-1. Sign up at [Unsplash Developers](https://unsplash.com/developers)
-2. Create a new application
-3. Copy the **Access Key**
-4. Replace `YOUR_UNSPLASH_ACCESS_KEY_HERE` in `local.settings.json`
+A full deployment pipeline is implemented using GitHub Actions.
 
-### 7. Build the Project
+Every push to the main branch triggers:
 
-### 8. Run the Function App
+Restore & build (.NET 8 isolated Azure Function)
 
-## ⚙️ Configuration
+Publish the project
 
-### host.json Settings
+Deploy automatically to Azure Function App
 
-**Important:** `"messageEncoding": "none"` is required for queue triggers to work properly with `BinaryData.FromString()` in .NET 8 isolated worker mode.
+Deployment uses the Azure Function publish profile stored securely as a GitHub secret.
 
-This is crucial for .NET 8 isolated worker mode to properly deserialize queue messages.
+### ✅ Requirement fully met.
 
-### Blob Storage Permissions
+### ✅ 2. Authentication on the API (Function Keys)
 
-The application automatically sets container permissions based on environment:
+Each endpoint is protected using Azure Function API Keys:
 
-- **Local Development (Azurite):** `PublicAccessType.Blob` - Direct URL access
-- **Production (Azure):** `PublicAccessType.None` - SAS URL required
+Requests must include
+?code=<FUNCTION_KEY>
 
-The `SetAccessPolicyAsync()` call ensures existing containers get updated permissions.
-
-### Image Processing
-
-Images are processed using SixLabors.ImageSharp:
-1. Download random image from Unsplash
-2. Load image into memory
-3. Draw semi-transparent background
-4. Add weather station name and temperature text
-5. Save as JPEG
-6. Upload to Blob Storage
+Without the code → request is rejected.
 
 
-# Usage
+### ✅ Function Key (API Key) — provided separately.
+### ✅ Works with Postman, cURL, or browser.
 
-### Starting a New Job
-## API Usage & Workflow
-### 1. Start a New Job (Local)
+### ✅ Requirement fully met.
+
+## ✅ 3. Use SAS Token Instead of Public Blob URLs
+
+Images are NOT publicly accessible in Blob Storage.
+Instead, the system creates time-limited, read-only SAS URLs.
+- Example returned by the API:
 ```
-POST {{baseUrl}}/jobs
-Content-Type: application/json
+https://weatherXXXX.blob.core.windows.net/weather-images/6240.jpg?sv=2023-11-03&st=2025-11-06...&sp=r&sig=XXXXX
+```
+### This SAS URL:
+- expires after hours
+- allows only read access
+- cannot be used to upload/modify data
+- keeps blob storage private
 
+
+## ✅ 4. Status Endpoint + Saving Status in Azure Table Storage
+
+Every processing request becomes a Job, stored in Azure Table Storage (JobStatus table).
+```
+| Field              | Description                            |
+| ------------------ | -------------------------------------- |
+| JobId              | Unique job identifier                  |
+| Status             | Pending / Running / Completed / Failed |
+| ProgressPercentage | 0–100                                  |
+| TotalStations      | How many stations are processed        |
+| ProcessedStations  | How many finished                      |
+| ImageUrls          | SAS-token URLs                         |
+| CreatedAt          | Timestamp                              |
+| CompletedAt        | Timestamp                              |
+| ErrorMessage       | On failure                             |
+```
+### ✅ Status Endpoint
+```
+GET /api/jobs/{jobId}?code=<key>
+```
+- Returns job status + SAS URLs.
+
+## ✅ 5. Job Creation Endpoint
+```
+POST /api/jobs?code=<key>
 {
-  "searchKeyword": "netherlands",
+  "searchKeyword": "clouds",
   "city": "Amsterdam",
   "maxStations": 10
 }
 ```
-### 2. Get Job Results by ID
-Replace with actual jobId from the previous response
+## ✅ How the System Works (Architecture Flow)
+
+1.  POST /jobs
+- Validates input
+
+- Creates a Job record in Table Storage
+
+- Sends a message to a queue
+
+- Returns jobId to the client
+
+2. Queue Trigger Function
+
+- Fetches weather-station data
+
+- Gets an Unsplash image
+
+- Processes it (resize, overlay watermark/timestamp)
+
+-Saves result to Blob Storage
+
+Updates JobStatus in Table Storage
+
+3. Client Polls Status
+
+- Using GET /jobs/{jobId}
+
+- Gets progress + SAS URLs
+
+✅ Fully asynchronous & scalable.
+
+## ✅ Azure Resources Used
 ```
-GET {{baseUrl}}/jobs/3fa85f64-5717-4562-b3fc-2c963f66afa6
-To process weather data and generate images:
+| Resource                   | Purpose                        |
+| -------------------------- | ------------------------------ |
+| **Azure Function App**     | Hosts API and queue processing |
+| **Azure Storage Account**  | Blob, Queue, and Table Storage |
+| **Azure Table Storage**    | Stores job progress            |
+| **Azure Queues**           | Async background processing    |
+| **Blob Storage (Private)** | Stores generated images        |
+| **SAS Tokens**             | Secure image access            |
+| **GitHub Actions**         | CI/CD automated deployment     |
 ```
-1. **Open Postman or any API client**
-2. **Create a POST request** to `http://localhost:7071/api/jobs`
-3. **Send** the request
-4. **Check the response** for `JobId` and status
+## ✅ CI/CD Pipeline Summary
 
-### Checking Job Status
-
-To check the status of a job and retrieve image URLs:
-
-6. **Send** → Copy the `jobId` from the response
-7. **Create a GET request** to `http://localhost:7071/api/jobs/{jobId}`
-8. **Send** to check job status and get image URLs
-
-### Viewing Images with Microsoft Azure Storage Explorer
-
-**Microsoft Azure Storage Explorer** is the primary tool used for viewing and managing the generated weather images:
-
-1. **Open Microsoft Azure Storage Explorer**
-2. **Navigate to:** 
-- **Local & Attached** → **Emulator - Default Ports** → **Blob Containers** → **weather-images**
-3. **View Images:**
-- You'll see all uploaded images listed (e.g., `6370_20251009100000.jpg`)
-- **Double-click** any image to preview it with the weather overlay
-- **Right-click** → **Download** to save locally
-4. **Check Image Properties:**
-- Right-click on an image → **Properties**
-- View metadata, size, content type, etc.
-
-### Alternative: View Images in Browser
-
-Once the job is complete, you can also **click on the image URLs directly in your browser** (if container permissions are set to public):
-
-## 🔧 Troubleshooting
-
-### Issue: Images Don't Load in Browser (403 Forbidden)
-
-**Problem:** Container has private access, preventing direct URL access.
-
-**Solution: Using Microsoft Azure Storage Explorer**
-
-1. **Open Microsoft Azure Storage Explorer**
-2. **Navigate to:** 
-   - **Local & Attached** → **Emulator - Default Ports** → **Blob Containers** → **weather-images**
-3. **Right-click on `weather-images` container**
-4. **Select:** **Set Public Access Level**
-5. **Choose:** "Public read access for blobs only"
-6. **Click OK**
-
-**Verification:**
-- The container icon should now show a globe symbol 🌐
-- Test an image URL in your browser - it should now work!
-
-**Alternative Solution: Delete and Recreate Container (Using Azure Storage Explorer)**
-
-1. **Stop the function** (Ctrl+C in terminal)
-2. **In Microsoft Azure Storage Explorer:**
-   - Navigate to **weather-images** container
-   - **Right-click** → **Delete**
-   - Confirm deletion
-3. **Restart function:** `func start`
-4. **Trigger a new job** - container will be created with correct public permissions automatically
-
-### Issue: Queue Triggers Not Firing
-
-**Problem:** Messages fail to decode and are moved to poison queue.
-
-**Diagnosis Using Microsoft Azure Storage Explorer:**
-
-1. **Open Microsoft Azure Storage Explorer**
-2. **Navigate to:** **Local & Attached** → **Emulator** → **Queues**
-3. **Check for poison queues:**
-   - `weather-stations-queue-poison`
-   - `process-image-queue-poison`
-4. **View messages** in poison queues to see what failed
-
-**Solution:**
-
-1. **Verify** `"messageEncoding": "none"` is set in `host.json`
-2. **In Microsoft Azure Storage Explorer:**
-   - Right-click on `weather-stations-queue-poison` → **Delete Queue**
-   - Right-click on `process-image-queue-poison` → **Delete Queue**
-3. **Restart the function**
-4. **Trigger a new job**
-
-### Issue: Job Stuck in "Pending" Status
-
-**Problem:** Queue messages aren't being processed.
-
-**Diagnosis Using Microsoft Azure Storage Explorer:**
-
-1. **Check queue message counts:**
-   - Navigate to **Queues** in Azure Storage Explorer
-   - Check `weather-stations-queue` - should show messages if job is pending
-   - Check `process-image-queue` - should show messages if stations are being processed
-
-2. **Inspect a queue message:**
-   - Right-click on a queue → **View Messages**
-   - Check if message format is correct JSON
-
-**Solution:**
-- If messages are stuck, clear the queues using Azure Storage Explorer
-- Restart the function app
-- Trigger a new job
-
-### Issue: Unsplash API Errors
-
-**Problem:** "No image URL found in Unsplash response"
-
-**Possible causes:**
-- Invalid or missing Unsplash Access Key
-- Rate limit exceeded (50 requests/hour for free tier)
-- Network connectivity issues
-
-**Solution:**
-- Verify your Unsplash Access Key in `local.settings.json`
-- Wait if rate limit is exceeded
-- Check logs for detailed error messages
-
-### Issue: Package Vulnerabilities
-
-**Problem:** Build warnings about `SixLabors.ImageSharp` vulnerabilities.
-
-**Solution:**
-Check [NuGet](https://www.nuget.org/packages/SixLabors.ImageSharp) for the latest secure version.
-
-
-
-
-
-
-
+File: .github/workflows/deploy-function-app.yml
+- ✅ Automatically triggered on push to main
+- ✅ Builds .NET 8 Azure Function
+- ✅ Publishes to Azure Function output folder
+- ✅ Deploys using Function Publish Profile
+- ✅ No manual steps needed
 
 
