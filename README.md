@@ -249,9 +249,9 @@ POST /api/jobs?code=<key>
 
 - Processes it (resize, overlay watermark/timestamp)
 
--Saves result to Blob Storage
+- Saves result to Blob Storage
 
-Updates JobStatus in Table Storage
+- Updates JobStatus in Table Storage
 
 3. Client Polls Status
 
