@@ -169,7 +169,6 @@ Deploy automatically to Azure Function App
 
 Deployment uses the Azure Function publish profile stored securely as a GitHub secret.
 
-### ✅ Requirement fully met.
 
 ### ✅ 2. Authentication on the API (Function Keys)
 
@@ -184,7 +183,6 @@ Without the code → request is rejected.
 ### ✅ Function Key (API Key) — provided separately.
 ### ✅ Works with Postman, cURL, or browser.
 
-### ✅ Requirement fully met.
 
 ## ✅ 3. Use SAS Token Instead of Public Blob URLs
 
@@ -204,7 +202,7 @@ https://weatherXXXX.blob.core.windows.net/weather-images/6240.jpg?sv=2023-11-03&
 ## ✅ 4. Status Endpoint + Saving Status in Azure Table Storage
 
 Every processing request becomes a Job, stored in Azure Table Storage (JobStatus table).
-```
+
 | Field              | Description                            |
 | ------------------ | -------------------------------------- |
 | JobId              | Unique job identifier                  |
@@ -216,7 +214,7 @@ Every processing request becomes a Job, stored in Azure Table Storage (JobStatus
 | CreatedAt          | Timestamp                              |
 | CompletedAt        | Timestamp                              |
 | ErrorMessage       | On failure                             |
-```
+
 ### ✅ Status Endpoint
 ```
 GET /api/jobs/{jobId}?code=<key>
@@ -264,7 +262,7 @@ Updates JobStatus in Table Storage
 ✅ Fully asynchronous & scalable.
 
 ## ✅ Azure Resources Used
-```
+
 | Resource                   | Purpose                        |
 | -------------------------- | ------------------------------ |
 | **Azure Function App**     | Hosts API and queue processing |
@@ -274,7 +272,7 @@ Updates JobStatus in Table Storage
 | **Blob Storage (Private)** | Stores generated images        |
 | **SAS Tokens**             | Secure image access            |
 | **GitHub Actions**         | CI/CD automated deployment     |
-```
+
 ## ✅ CI/CD Pipeline Summary
 
 File: .github/workflows/deploy-function-app.yml
@@ -283,5 +281,19 @@ File: .github/workflows/deploy-function-app.yml
 - ✅ Publishes to Azure Function output folder
 - ✅ Deploys using Function Publish Profile
 - ✅ No manual steps needed
+
+## ✅ Updated Requirements Table (Including Bicep + deploy.ps1)
+| Requirement                                                                       | Status | Explanation                                                                                            |
+| --------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| Automatic CI/CD deployment from GitHub                                            | ✅ Done | GitHub Actions deploys automatically to Azure Function App on every push to main                       |
+| API authentication                                                                | ✅ Done | All endpoints protected with Function Keys                                                             |
+| SAS tokens for images                                                             | ✅ Done | Blob Storage is private; images are returned using time-limited SAS tokens                             |
+| Status endpoint                                                                   | ✅ Done | `/jobs/{jobId}` returns progress, logs, and SAS URLs                                                   |
+| Save status in Table Storage                                                      | ✅ Done | Job status stored and updated in Azure Table Storage                                                   |
+| Async queue processing                                                            | ✅ Done | Job creation triggers queue workers for weather + image processing                                     |
+| Image processing pipeline                                                         | ✅ Done | Unsplash fetch → watermark → resize → optimize → store in Blob                                         |
+| Function App configured in Azure                                                  | ✅ Done | Fully hosted & running                                                                                 |
+| **Create a fitting Bicep template (including queues)**                            | ✅ Done | A full Bicep template provisions the Function App, Storage Account, Tables, Queues, App Settings, etc. |
+| **Create a `deploy.ps1` script (dotnet publish + Bicep deploy + CLI deployment)** | ✅ Done | Script builds the project, deploys Azure infra using Bicep, and deploys code using Azure CLI           |
 
 
