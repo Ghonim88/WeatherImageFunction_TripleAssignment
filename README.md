@@ -172,7 +172,7 @@ Deployment uses the Azure Function publish profile stored securely as a GitHub s
 
 ### ✅ 2. Authentication on the API (Function Keys)
 
-Each endpoint is protected using Azure Function API Keys:
+Each endpoint is protected using Azure **Function API Keys**:
 
 Requests must include
 ?code=<FUNCTION_KEY>
