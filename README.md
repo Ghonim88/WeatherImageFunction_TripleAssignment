@@ -282,7 +282,7 @@ File: .github/workflows/deploy-function-app.yml
 - ✅ Deploys using Function Publish Profile
 - ✅ No manual steps needed
 
-## ✅ Updated Requirements Table (Including Bicep + deploy.ps1)
+## ✅ All Requirements — Final Checklist
 | Requirement                                                                       | Status | Explanation                                                                                            |
 | --------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
 | Automatic CI/CD deployment from GitHub                                            | ✅ Done | GitHub Actions deploys automatically to Azure Function App on every push to main                       |
