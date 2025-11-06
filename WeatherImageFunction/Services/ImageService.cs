@@ -159,14 +159,43 @@ public class ImageService : IImageService
             var tempText = station.Temperature.HasValue ? $"{station.Temperature:F1}°C" : "N/A";
             var overlayText = $"{nameLine}\n{tempText}";
 
-            // Fonts
-            var overlayFontSize = GetConfigFloat("ImageOverlay:FontSize", 48f);
-            var overlayFont = GetConfiguredFont(overlayFontSize, FontStyle.Bold);
+            // Fonts: auto-shrink to fit the band
+            var baseFontSize = GetConfigFloat("ImageOverlay:FontSize", 48f);
+            var wrappingLength = Math.Max(20, image.Width - 40);
+            var minFontSize = MathF.Max(14f, baseFontSize * 0.6f); // allow up to ~40% shrink
 
-            // Compute bottom band safely within bounds
-            var bandHeight = Math.Max(overlayFontSize * 3.0f, overlayFontSize + 20);
-            var bandY = Math.Max(0, image.Height - bandHeight - 10);
-            var bandRect = new RectangleF(0, bandY, image.Width, Math.Min(image.Height - bandY, bandHeight + 10));
+            float chosenSize = baseFontSize;
+            Font testFont = GetConfiguredFont(chosenSize, FontStyle.Bold);
+
+            // Iteratively reduce font size until text fits within the band and wrapping width
+            for (;;)
+            {
+                // Band height scales with font size (same formula as drawing)
+                var bandHeight = Math.Max(chosenSize * 3.0f, chosenSize + 20);
+                var allowedTextHeight = Math.Max(0, bandHeight - 20);
+
+                var measure = TextMeasurer.MeasureSize(
+                    overlayText,
+                    new TextOptions(testFont) { WrappingLength = wrappingLength }
+                );
+
+                var fitsWidth = measure.Width <= wrappingLength;
+                var fitsHeight = measure.Height <= allowedTextHeight;
+
+                if ((fitsWidth && fitsHeight) || chosenSize <= minFontSize)
+                    break;
+
+                chosenSize = MathF.Max(minFontSize, chosenSize - 2f);
+                testFont = GetConfiguredFont(chosenSize, FontStyle.Bold);
+            }
+
+            var overlayFontSize = chosenSize;
+            var overlayFont = testFont;
+
+            // Compute bottom band based on final font size
+            var finalBandHeight = Math.Max(overlayFontSize * 3.0f, overlayFontSize + 20);
+            var bandY = Math.Max(0, image.Height - finalBandHeight - 10);
+            var bandRect = new RectangleF(0, bandY, image.Width, Math.Min(image.Height - bandY, finalBandHeight + 10));
 
             image.Mutate(ctx =>
             {
@@ -175,7 +204,7 @@ public class ImageService : IImageService
                 var textOptions = new RichTextOptions(overlayFont)
                 {
                     Origin = new SixLabors.ImageSharp.PointF(20, Math.Max(0, bandRect.Y + 10)),
-                    WrappingLength = Math.Max(20, image.Width - 40),
+                    WrappingLength = wrappingLength,
                     HorizontalAlignment = HorizontalAlignment.Left
                 };
                 ctx.DrawText(textOptions, overlayText, Color.White);
